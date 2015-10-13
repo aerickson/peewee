@@ -1705,7 +1705,7 @@ class QueryCompiler(object):
             clauses.extend([SQL('HAVING'), query._having])
 
         if query._order_by:
-            clauses.extend([SQL('ORDER BY'), CommaClause(*query._order_by)])
+            clauses.extend([SQL('ORDER BY'), CommaClause(*query._order_by), SQL('COLLATE NOCASE')])
 
         if query._limit or (query._offset and db.limit_max):
             limit = query._limit or db.limit_max

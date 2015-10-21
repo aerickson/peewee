@@ -1705,7 +1705,10 @@ class QueryCompiler(object):
             clauses.extend([SQL('HAVING'), query._having])
 
         if query._order_by:
-            clauses.extend([SQL('ORDER BY'), CommaClause(*query._order_by), SQL('COLLATE NOCASE')])
+            if query._order_by_nocase:
+                clauses.extend([SQL('ORDER BY'), CommaClause(*query._order_by), SQL('COLLATE NOCASE')])
+            else:
+                clauses.extend([SQL('ORDER BY'), CommaClause(*query._order_by)])
 
         if query._limit or (query._offset and db.limit_max):
             limit = query._limit or db.limit_max
@@ -2606,6 +2609,7 @@ class SelectQuery(Query):
         self._group_by = None
         self._having = None
         self._order_by = None
+        self._order_by_nocase = None
         self._windows = None
         self._limit = None
         self._offset = None

@@ -1705,10 +1705,10 @@ class QueryCompiler(object):
             clauses.extend([SQL('HAVING'), query._having])
 
         if query._order_by:
-            if query._order_by_nocase:
-                clauses.extend([SQL('ORDER BY'), CommaClause(*query._order_by), SQL('COLLATE NOCASE')])
-            else:
-                clauses.extend([SQL('ORDER BY'), CommaClause(*query._order_by)])
+            clauses.extend([SQL('ORDER BY'), CommaClause(*query._order_by)])
+
+        if query._collate_nocase:
+            clauses.append(SQL('COLLATE NOCASE'))
 
         if query._limit or (query._offset and db.limit_max):
             limit = query._limit or db.limit_max
@@ -2609,8 +2609,8 @@ class SelectQuery(Query):
         self._group_by = None
         self._having = None
         self._order_by = None
-        self._order_by_nocase = None
         self._windows = None
+        self._collate_nocase = None
         self._limit = None
         self._offset = None
         self._distinct = False
@@ -2641,6 +2641,7 @@ class SelectQuery(Query):
             query._order_by = list(self._order_by)
         if self._windows is not None:
             query._windows = list(self._windows)
+        query._collate_nocase = self._collate_nocase
         query._limit = self._limit
         query._offset = self._offset
         query._distinct = self._distinct
@@ -2701,6 +2702,10 @@ class SelectQuery(Query):
     @returns_clone
     def window(self, *windows):
         self._windows = list(windows)
+
+    @returns_clone
+    def collate_nocase(self):
+        self._collate_nocase = True
 
     @returns_clone
     def limit(self, lim):
